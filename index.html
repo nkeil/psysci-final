@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <title>Mushroom Codex</title>
+    <style>
+      #canvas-container {
+        width: 100%;
+        text-align: center;
+      }
+      #desc {
+        padding: 50px;
+        border: 5px green solid;
+        border-radius: 10px;
+        background-color: rgb(209, 244, 209);
+        margin-inline: 10%;
+      }
+      #canvas {
+        margin: auto;
+      }
+      .nav {
+        background-color: rgb(243, 243, 243);
+      }
+      .nav-link {
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="text-center">The Mixtec Mesoamerican Mushroom Codex</h1>
+    <ul class="nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link active" href="index.html">Codex</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="background.html">Background</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="sources.html">Sources</a>
+      </li>
+    </ul>
+
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+      <p id="desc" class="text-center">
+        Click on any of the numbers on the codex to learn more about each part
+        of the story!
+      </p>
+    </div>
+  </body>
+  <script async>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const desc = document.getElementById("desc");
+
+    references = [
+      {
+        x: 350,
+        y: 440,
+        w: 375,
+        h: 180,
+        description: `
+          The story begins on the banks of the Apolaga River, 
+          with the meeting of two ñuhu (sacred beings), one red 
+          and the other golden. Above this, we see a dialogue 
+          between two deities, an wize old man and Quetzalcoatl, 
+          the feathered-serpent deity who is mythicized to be the 
+          ancestor of all Mesoamerican people.
+        `,
+      },
+      {
+        x: 360,
+        y: 250,
+        w: 375,
+        h: 190,
+        description: `
+          Quetzalcoatl carries another deity on his back, shown 
+          with three mushrooms on its head. These beings visit 
+          Tlaloc and the valley of the ancient dead, seeing there 
+          a growth of primordial corn. 
+        `,
+      },
+      {
+        x: 370,
+        y: 110,
+        w: 360,
+        h: 140,
+        description: `
+          Here we see Quetzalcoatl creating music, singing to the
+          sounds of him scraping a bone against a human skull. In front 
+          of him, with tears in his eyes and holding in his hand two 
+          mushrooms, is the god Xochipilli, the prince of flowers. 
+          The tears may be a result of a trance-like state induced 
+          by the ceremony. In the background, we see the two ñuhu who 
+          started the story, accompanied by a nocturnal insect, which 
+          suggests that the mushroom ceremony was carried out at night.
+        `,
+      },
+      {
+        x: 10,
+        y: 0,
+        w: 710,
+        h: 240,
+        description: `
+          Depicted here is a collection of items: a mat, a throne, a 
+          cradle, a walled city, and on the far right (hard to see), 
+          a singing deity. From these items brought together, a kingdom
+          is built. Facing them on the left are 7 deities holding 
+          mushrooms. This is the only pre-Hispanic representation 
+          of a mushroom ceremony which has survived in Mesoamerica.
+        `,
+      },
+      {
+        x: 0,
+        y: 230,
+        w: 350,
+        h: 300,
+        description: `
+          A character painted black is thrown into a cave, to later 
+          emerge as a deity, holding in his hand sacred mushrooms 
+          (the yellowish plants). This character is now wearing an eagle 
+          mask and two faces, each looking in opposite directions. In 
+          front of him is another deity wearing a jaguar head.
+        `,
+      },
+      {
+        x: 170,
+        y: 570,
+        w: 0,
+        h: 0,
+        description: `
+          Subsequently, (on a later page) the 6 deities from the 
+          ritual appear without mushrooms. They seem changed; it 
+          was believed that mushrooms could be a path to spiritual 
+          growth or rebirth. Some are larger, others with new 
+          clothes or additional ornaments. The story continues with 
+          the birth of the sun on a pyramid of songs. When it rizes 
+          to reach its zenith, it is represented as a powerful 
+          warrior who throws powerful rays like arrows.
+
+          The new sun has been born through a sacred ceremony 
+          in which Quetzalcoatl brought the sacred mushrooms that 
+          were consumed by eight of the most prolific deities. 
+          The story ends on a note of duality: light and darkness, 
+          night and day.
+        `,
+      },
+    ];
+
+    function drawRect(x, y, w, h) {
+      ctx.beginPath();
+      ctx.moveTo(x + w / 2, y);
+      ctx.bezierCurveTo(x + w, y, x + w, y, x + w, y + h / 2);
+      ctx.bezierCurveTo(x + w, y + h, x + w, y + h, x + w / 2, y + h);
+      ctx.bezierCurveTo(x, y + h, x, y + h, x, y + h / 2);
+      ctx.bezierCurveTo(x, y, x, y, x + w / 2, y);
+      ctx.stroke();
+    }
+    imageDim = { x: 732, y: 628 };
+    frame = 50;
+
+    canvas.width = imageDim.x + frame * 2;
+    canvas.height = imageDim.y + frame * 2;
+    img = new Image();
+    img.src = "codex.jpg";
+
+    visible = Array(references.length).fill(false);
+    active = 0;
+    console.log(visible);
+
+    function draw() {
+      ctx.beginPath();
+      ctx.fillStyle = "white";
+      ctx.rect(0, 0, imageDim.x + frame * 2, imageDim.y + frame * 2);
+      ctx.fill();
+
+      ctx.drawImage(img, frame, frame);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 5;
+      for (const [i, r] of references.entries()) {
+        if (visible[i]) {
+          drawRect(r.x + frame, r.y + frame, r.w, r.h);
+        }
+
+        ctx.beginPath();
+        ctx.arc(r.x + frame + 7, r.y + frame, 20, 0, 2 * Math.PI, false);
+        ctx.fillStyle = "black";
+        ctx.fill();
+
+        ctx.fillStyle = "white";
+        ctx.font = "30px sans serif";
+        ctx.fillText((i + 1).toString(), r.x + frame, r.y + frame + 10);
+      }
+      window.requestAnimationFrame(draw);
+    }
+
+    function inCircle(x, y, r) {
+      return (
+        x <= r.x + frame + 27 &&
+        x >= r.x + frame - 13 &&
+        y <= r.y + frame + 20 &&
+        y >= r.y + frame - 20
+      );
+    }
+
+    canvas.addEventListener("mousemove", (event) => {
+      const x = event.offsetX;
+      const y = event.offsetY;
+      for (const [i, r] of references.entries()) {
+        if (inCircle(x, y, r)) {
+          visible[i] = true;
+          active = i;
+        } else {
+          visible[i] = false;
+        }
+      }
+      console.log(visible);
+    });
+
+    canvas.addEventListener("mousedown", (event) => {
+      desc.innerText = references[active].description;
+    });
+
+    window.requestAnimationFrame(draw);
+  </script>
+</html>
